@@ -6,9 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 
-import 'package:flutter_calendar/flutter_calendar.dart';
 import 'package:flutter_stetho/flutter_stetho.dart';
 import 'package:http/http.dart';
+
+import 'login_route.dart';
+import 'feed_route.dart';
+import 'calendar_route.dart';
 
 const String _name = "Your Name";
 var httpClient = Client();
@@ -36,32 +39,13 @@ void main() {
       initialRoute: '/',
       routes: {
         // When we navigate to the "/" route, build the FirstScreen Widget
-        '/': (context) => FirstScreen(),
+        '/': (context) => LoginRoute(),
         // When we navigate to the "/second" route, build the SecondScreen Widget
         '/second': (context) => ChatScreen(apiRoot: 'http://api.flutter.institute/'), // http://heyabuddy.com/daily_logs,
+        '/calendar': (context) => CalendarRoute(items: List<String>.generate(100, (i) => "Item $i")),
       },
     )
   );
-}
-
-class FirstScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('First Screen'),
-      ),
-      body: Center(
-        child: RaisedButton(
-          child: Text('Launch screen'),
-          onPressed: () {
-            // Navigate to the second screen using a named route
-            Navigator.pushNamed(context, '/second');
-          },
-        ),
-      ),
-    );
-  }
 }
 
 class ChatScreen extends StatefulWidget {
@@ -80,9 +64,7 @@ enum ResultStatus {
 }
 
 class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
-  final List<ChatMessage> _messages = <ChatMessage>[];
-  final TextEditingController _textController = TextEditingController();
-  bool _isComposing = false;
+  final items = List<String>.generate(100, (i) => "Item $i");
 
   ResultStatus _status;
   String _name;
@@ -157,65 +139,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     }
   }
 
-  void _handleSubmitted(String text) {
-    if (!_isComposing) {
-      return;
-    }
-    _textController.clear();
-    setState(() {
-      _isComposing = false;
-    });
-    ChatMessage message = ChatMessage(
-      text: text,
-      animationController: AnimationController(
-        duration: Duration(milliseconds: 1000),
-        vsync: this,
-      ),
-    );
-    setState(() {
-      _messages.insert(0, message);
-    });
-    message.animationController.forward();
-  }
-
-  Widget _buildTextComposer() {
-    return IconTheme(
-      data: IconThemeData(color: Theme.of(context).accentColor),
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 8.0),
-        child: Row(
-          children: <Widget>[
-            Flexible(
-              child: TextField(
-                controller: _textController,
-                onChanged: (String text) {
-                  setState(() {
-                    _isComposing = text.length > 0;
-                  });
-                },
-                onSubmitted: _handleSubmitted,
-                decoration: InputDecoration.collapsed(
-                  hintText: "Send a message"),
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 4.0),
-              child: Theme.of(context).platform == TargetPlatform.iOS ?
-                CupertinoButton(
-                  child: Text("Send"),
-                  onPressed: _isComposing ? () =>  _handleSubmitted(_textController.text) : null,
-                ) :
-                IconButton(
-                  icon: Icon(Icons.send),
-                  onPressed: _isComposing ? () =>  _handleSubmitted(_textController.text) : null,
-                )
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget buildAPIContent(BuildContext context) {
     if (_status != null) {
       switch (_status) {
@@ -263,10 +186,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     return Container();
   }
 
-  void onDateSelected(DateTime date) {
-    print(date);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -278,19 +197,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       body: Container(
         child: Column(
           children: <Widget>[
-            Flexible(
-              child: ListView.builder(
-                padding: EdgeInsets.all(8.0),
-                reverse: true,
-                itemBuilder: (_, int index) => _messages[index],
-                itemCount: _messages.length,
-              ),
-            ),
-            Divider(height: 1.0),
-            Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor),
-              child: _buildTextComposer(),
+            FeedRoute(
+              items: List<String>.generate(100, (i) => "Item $i"),
             ),
             Divider(height: 5.0),
             ButtonBar(
@@ -321,10 +229,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             ),
             SizedBox(height: 20.0),
             buildAPIContent(context),
-            Calendar(
-              isExpandable: true,
-              onDateSelected: onDateSelected,
-            ),
             RaisedButton(
               onPressed: () {
                 // Navigate back to the first screen by popping the current route
@@ -344,13 +248,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             : null
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    for (ChatMessage message in _messages)
-      message.animationController.dispose();
-    super.dispose();
   }
 }
 
