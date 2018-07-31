@@ -12,7 +12,6 @@ class CalendarScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title = 'Long List';
 
     return Calendar(
       isExpandable: true,

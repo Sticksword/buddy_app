@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
 class SettingsScreen extends StatelessWidget {
+  Function logout;
+  
+  SettingsScreen({Key key, @required this.logout}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -12,7 +16,8 @@ class SettingsScreen extends StatelessWidget {
           child: Text('Log out'),
           onPressed: () {
             // Navigate to the second screen using a named route
-            Navigator.pushReplacementNamed(context, '/');
+            // Navigator.pushReplacementNamed(context, '/');
+            logout();
           },
         ),
       ),

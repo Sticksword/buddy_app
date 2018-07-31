@@ -2,9 +2,14 @@ import 'dart:async'; // await
 import 'dart:convert'; // JSON.decode & encode
 
 import 'package:flutter/material.dart';
+
 import 'package:buddy_app/screens/feed_screen.dart';
 import 'package:buddy_app/screens/calendar_screen.dart';
 import 'package:buddy_app/screens/settings_screen.dart';
+import 'package:buddy_app/auth.dart';
+import 'package:buddy_app/data/database_helper.dart';
+import 'package:buddy_app/models/user.dart';
+import 'package:buddy_app/screens/login_screen.dart';
 
 enum ResultStatus {
   success,
@@ -19,12 +24,42 @@ class MainScreen extends StatefulWidget {
   State createState() => _MainScreenState();
 } 
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen> implements AuthStateListener {
+  BuildContext _ctx;
   List<String> _items;
+
+  final scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
+    print('initializing main screen state');
+    print(_ctx);
+    print(context);
     _items = List<String>.generate(100, (i) => "Item $i");
+    
+    var authStateProvider = new AuthStateProvider();
+    authStateProvider.subscribe(this);
+  }
+
+  void _logout() async {
+    var db = new DatabaseHelper();
+    await db.deleteUsers();
+    var authStateProvider = new AuthStateProvider();
+    authStateProvider.notify(AuthState.LOGGED_OUT);
+    print('_logout');
+  }
+
+  @override
+  onAuthStateChanged(AuthState state) {
+    print('main screen onAuthStateChanged');
+    print(_ctx);
+    print(context);
+
+    if(state == AuthState.LOGGED_OUT)
+      Navigator.pushReplacement(
+      context,
+      new MaterialPageRoute(
+          builder: (BuildContext context) => new LoginScreen()));
   }
   // Future getItem(int id) async {
   //   setState(() {
@@ -91,28 +126,37 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    _ctx = context;
     return DefaultTabController(
       length: 3,
       child: Scaffold(
+        key: scaffoldKey,
         appBar: AppBar(
           bottom: TabBar(
             tabs: [
-              Tab(icon: Icon(Icons.directions_car)),
-              Tab(icon: Icon(Icons.directions_transit)),
-              Tab(icon: Icon(Icons.directions_bike)),
+              Tab(icon: Icon(Icons.rss_feed)),
+              Tab(icon: Icon(Icons.calendar_today)),
+              Tab(icon: Icon(Icons.settings)),
             ],
           ),
-          title: Text('Buddy Tabs Demo'),
+          title: Text('Buddy'),
           elevation: Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
         ),
         body: TabBarView(
           children: [
             FeedScreen(items: _items),
             CalendarScreen(items: _items),
-            SettingsScreen(),
+            SettingsScreen(logout: () => _logout()),
           ],
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    var authStateProvider = new AuthStateProvider();
+    authStateProvider.dispose(this);
+    super.dispose();
   }
 }
