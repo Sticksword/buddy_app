@@ -10,17 +10,23 @@ class NetworkUtil {
 
   final JsonDecoder _decoder = new JsonDecoder();
 
-  Future<dynamic> get(String url) {
-    return http.get(url).then((http.Response response) {
-      final String res = response.body;
-      final int statusCode = response.statusCode;
+  Future<dynamic> get(String url, {Map<String, String> headers}) {
+    print('making get request');
+    return http
+      .get(url, headers: headers)
+      .then((http.Response response) {
+        print('hello from network_util');
+        final String res = response.body;
+        print(res);
+        final int statusCode = response.statusCode;
 
-      if (statusCode < 200 || statusCode > 400 || res == null) {
-        print('there was a problem with the request');
-        throw new Exception("Error while fetching data");
-      }
-      return _decoder.convert(res);
-    });
+        if (statusCode < 200 || statusCode > 400 || res == null) {
+          print('there was a problem with the request');
+          print(statusCode);
+          throw new Exception("Error while fetching data");
+        }
+        return _decoder.convert(res);
+      });
   }
 
   Future<dynamic> post(String url, {Map headers, body, encoding}) {

@@ -8,7 +8,8 @@ import 'package:buddy_app/screens/calendar_screen.dart';
 import 'package:buddy_app/screens/settings_screen.dart';
 import 'package:buddy_app/auth.dart';
 import 'package:buddy_app/data/database_helper.dart';
-import 'package:buddy_app/models/user.dart';
+import 'package:buddy_app/data/daily_log_ds.dart';
+import 'package:buddy_app/models/daily_log.dart';
 import 'package:buddy_app/screens/login_screen.dart';
 
 enum ResultStatus {
@@ -29,6 +30,7 @@ class _MainScreenState extends State<MainScreen> implements AuthStateListener {
   List<String> _items;
 
   final scaffoldKey = new GlobalKey<ScaffoldState>();
+  DailyLogDatasource dailyLogDatasource = new DailyLogDatasource();
 
   @override
   void initState() {
@@ -39,6 +41,11 @@ class _MainScreenState extends State<MainScreen> implements AuthStateListener {
     
     var authStateProvider = new AuthStateProvider();
     authStateProvider.subscribe(this);
+
+    dailyLogDatasource.findAll().then((List<DailyLog> dailyLogs) {
+      print('successful findAll');
+      print(dailyLogs);
+    }).catchError((Exception error) => print('unsuccessful findAll'));
   }
 
   void _logout() async {

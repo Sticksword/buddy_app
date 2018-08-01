@@ -1,19 +1,24 @@
 // example usage - Post.fromJson(responseJson);
 // see more - https://flutter.io/cookbook/networking/authenticated-requests/
-class Post {
+class DailyLog {
   final int userId;
-  final int id;
-  final String title;
-  final String body;
+  final String text;
+  final double sentimentScore;
+  final double sentimentMagnitude;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
-  Post({this.userId, this.id, this.title, this.body});
+  DailyLog({this.userId, this.text, this.sentimentScore, this.sentimentMagnitude, this.createdAt, this.updatedAt});
 
-  factory Post.fromJson(Map<String, dynamic> json) {
-    return Post(
-      userId: json['userId'],
-      id: json['id'],
-      title: json['title'],
-      body: json['body'],
+  factory DailyLog.fromJson(Map<String, dynamic> json) {
+    print('called fromJson');
+    return DailyLog(
+      userId: json['user_id'],
+      text: json['text'],
+      sentimentScore: json['sentiment_score'],
+      sentimentMagnitude: json['sentiment_magnitude'],
+      createdAt: json['created_at'],
+      updatedAt: json['updated_at']
     );
   }
 }

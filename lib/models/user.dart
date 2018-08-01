@@ -1,20 +1,28 @@
 class User {
-  int _user_id;
-  String _username;
-  String _auth_token;
-  User(this._username);
+  int userId;
+  String email;
+  String authToken;
+  User(this.userId, this.email, this.authToken);
 
-  User.map(dynamic obj, String username) {
-    this._user_id = obj["id"];
-    this._auth_token = obj["auth_token"];
+  User.map(dynamic obj, String email) {
+    this.userId = obj["id"];
+    this.authToken = obj["auth_token"];
+    this.email = email;
   }
 
-  String get username => _username;
+  User.dbMap(dynamic obj) {
+    this.userId = obj["id"];
+    this.authToken = obj["auth_token"];
+    this.email = obj['email'];
+  }
+
+  String get username => email;
 
   Map<String, dynamic> toMap() {
     var map = new Map<String, dynamic>();
-    map["id"] = _user_id;
-    map["username"] = _username;
+    map["id"] = userId;
+    map["email"] = email;
+    map["auth_token"] = authToken;
 
     return map;
   }
