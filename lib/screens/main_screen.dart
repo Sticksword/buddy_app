@@ -19,25 +19,20 @@ enum ResultStatus {
 }
 
 class MainScreen extends StatefulWidget {
-  String apiRoot = 'http://api.flutter.institute/'; // http://heyabuddy.com/daily_logs,
 
   @override
   State createState() => _MainScreenState();
 } 
 
 class _MainScreenState extends State<MainScreen> implements AuthStateListener {
-  BuildContext _ctx;
-  List<String> _items;
+  List<DailyLog> _dailyLogs = new List();
 
-  final scaffoldKey = new GlobalKey<ScaffoldState>();
   DailyLogDatasource dailyLogDatasource = new DailyLogDatasource();
 
   @override
   void initState() {
+    super.initState();
     print('initializing main screen state');
-    print(_ctx);
-    print(context);
-    _items = List<String>.generate(100, (i) => "Item $i");
     
     var authStateProvider = new AuthStateProvider();
     authStateProvider.subscribe(this);
@@ -45,6 +40,9 @@ class _MainScreenState extends State<MainScreen> implements AuthStateListener {
     dailyLogDatasource.findAll().then((List<DailyLog> dailyLogs) {
       print('successful findAll');
       print(dailyLogs);
+      setState(() {
+        _dailyLogs = dailyLogs;
+      });
     }).catchError((Exception error) => print('unsuccessful findAll'));
   }
 
@@ -58,23 +56,15 @@ class _MainScreenState extends State<MainScreen> implements AuthStateListener {
 
   @override
   onAuthStateChanged(AuthState state) {
-    print('main screen onAuthStateChanged');
-    print(_ctx);
-    print(context);
-
     if(state == AuthState.LOGGED_OUT)
       Navigator.pushReplacement(
       context,
       new MaterialPageRoute(
           builder: (BuildContext context) => new LoginScreen()));
   }
-  // Future getItem(int id) async {
-  //   setState(() {
-  //     _status = ResultStatus.loading;
-  //   });
 
   //   try {
-  //     // print('${widget.apiRoot}/flutter-json.php?id=$id'); // view via `flutter logs`
+  //     // print('${widget.apiRoot}/flutter-json.php?id=$id');
   //     final response = await httpClient.get(
   //       '${widget.apiRoot}/flutter-json.php?id=$id',
   //       headers: {HttpHeaders.AUTHORIZATION: "Bearer your_api_token_here"},
@@ -100,13 +90,6 @@ class _MainScreenState extends State<MainScreen> implements AuthStateListener {
   //     });
   //   };
   // }
-
-  // Future postItem(int id) async {
-  //   setState(() {
-  //     _status = ResultStatus.loading;
-  //   });
-
-  //   try {
   //     final response = await httpClient.post(
   //       '${widget.apiRoot}/flutter-json.php',
   //       body: JSON.encode({'name': 'New Name'}),
@@ -114,30 +97,12 @@ class _MainScreenState extends State<MainScreen> implements AuthStateListener {
   //         'Content-Type': 'application/json',
   //       },
   //     );
-  //     if (response.statusCode != 200) {
-  //       setState(() {
-  //         _status = ResultStatus.failure;
-  //       });
-  //     } else {
-  //       setState(() {
-  //         _status = ResultStatus.success;
-  //         _name = _tags = null;
-  //       });
-  //     }
-  //   } catch (e) {
-  //     setState(() {
-  //       _status = ResultStatus.failure;
-  //     });
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
-    _ctx = context;
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        key: scaffoldKey,
         appBar: AppBar(
           bottom: TabBar(
             tabs: [
@@ -151,8 +116,8 @@ class _MainScreenState extends State<MainScreen> implements AuthStateListener {
         ),
         body: TabBarView(
           children: [
-            FeedScreen(items: _items),
-            CalendarScreen(items: _items),
+            FeedScreen(dailyLogs: _dailyLogs),
+            CalendarScreen(dailyLogs: _dailyLogs),
             SettingsScreen(logout: () => _logout()),
           ],
         ),

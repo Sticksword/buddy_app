@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
 import 'package:buddy_app/screens/detail_screen.dart';
+import 'package:buddy_app/models/daily_log.dart';
 
 class FeedScreen extends StatefulWidget {
-  final List<String> items;
+  final List<DailyLog> dailyLogs;
 
-  FeedScreen({Key key, @required this.items}) : super(key: key);
+  FeedScreen({Key key, @required this.dailyLogs}) : super(key: key);
 
   @override
   State createState() => _FeedScreenState();
@@ -15,25 +16,23 @@ class _FeedScreenState extends State<FeedScreen> {
   
   @override
   Widget build(BuildContext context) {
-
     return Container(
       child: ListView.builder(
         padding: EdgeInsets.all(8.0),
-        reverse: true,
         itemBuilder: (context, index) {
           return ListTile(
-            title: Text('${widget.items[index]}'),
+            title: Text('${widget.dailyLogs[index].text}'),
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => DetailScreen(todo: '${widget.items[index]}'),
+                  builder: (context) => DetailScreen(dailyLog: '${widget.dailyLogs[index].text}'),
                 ),
               );
             },
           );
         },
-        itemCount: widget.items.length,
+        itemCount: widget.dailyLogs.length,
       ),
       decoration: Theme.of(context).platform == TargetPlatform.iOS
         ? BoxDecoration(

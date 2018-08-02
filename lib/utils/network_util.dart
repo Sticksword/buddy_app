@@ -11,13 +11,10 @@ class NetworkUtil {
   final JsonDecoder _decoder = new JsonDecoder();
 
   Future<dynamic> get(String url, {Map<String, String> headers}) {
-    print('making get request');
     return http
       .get(url, headers: headers)
       .then((http.Response response) {
-        print('hello from network_util');
         final String res = response.body;
-        print(res);
         final int statusCode = response.statusCode;
 
         if (statusCode < 200 || statusCode > 400 || res == null) {
@@ -33,7 +30,6 @@ class NetworkUtil {
     return http
       .post(url, body: body, headers: headers, encoding: encoding)
       .then((http.Response response) {
-        print('hello from network_util');
         final String res = response.body;
         final int statusCode = response.statusCode;
 

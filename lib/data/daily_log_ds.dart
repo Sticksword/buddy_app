@@ -14,8 +14,6 @@ class DailyLogDatasource {
   Future<String> _authToken() async {
     var db = new DatabaseHelper();
     var token = await db.getAuthToken();
-    print('successfully read token');
-    print(token);
     return token;
   }
 
@@ -26,11 +24,6 @@ class DailyLogDatasource {
         print('hello from daily_log_ds');
         print(res.toString());
         print(res['error']);
-
-        var values = new List<String>();
-        values.add("Horses");
-        values.add("Goats");
-        values.add("Chickens");
 
         var data = res['data'];
         // print(data.map((dailyLogJson) => DailyLog.fromJson(dailyLogJson)).toList());
