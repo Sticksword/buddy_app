@@ -41,7 +41,7 @@ class _MainScreenState extends State<MainScreen> implements AuthStateListener {
       print('successful findAll');
       print(dailyLogs);
       setState(() {
-        _dailyLogs = dailyLogs;
+        _dailyLogs = dailyLogs.reversed.toList();
       });
     }).catchError((Exception error) => print('unsuccessful findAll'));
   }

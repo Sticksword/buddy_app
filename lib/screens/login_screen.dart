@@ -14,8 +14,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class LoginScreenState extends State<LoginScreen> implements AuthStateListener {
-  BuildContext _ctx;
-
   bool _isLoading = false;
   final formKey = new GlobalKey<FormState>();
   final scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -65,32 +63,24 @@ class LoginScreenState extends State<LoginScreen> implements AuthStateListener {
   @override
   onAuthStateChanged(AuthState state) {
     print('login screen onAuthStateChanged');
-    print(_ctx);
-    print(context);
 
     if(state == AuthState.LOGGED_IN)
       Navigator.pushReplacement(
-      _ctx,
+      context,
       new MaterialPageRoute(
           builder: (BuildContext context) => new MainScreen()));
   }
 
   @override
   Widget build(BuildContext context) {
-    _ctx = context;
     print('building login screen');
-    print(_ctx);
     var loginBtn = new RaisedButton(
       onPressed: _submit,
       child: new Text("LOGIN"),
-      color: Colors.primaries[0],
+      // color: Colors.primaries[0],
     );
     var loginForm = new Column(
       children: <Widget>[
-        new Text(
-          "HeyaBuddy",
-          textScaleFactor: 2.0,
-        ),
         new Form(
           key: formKey,
           child: new Column(
@@ -110,6 +100,7 @@ class LoginScreenState extends State<LoginScreen> implements AuthStateListener {
               new Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: new TextFormField(
+                  obscureText: true,
                   onSaved: (val) => _password = val,
                   decoration: new InputDecoration(labelText: "Password"),
                 ),
@@ -124,7 +115,7 @@ class LoginScreenState extends State<LoginScreen> implements AuthStateListener {
 
     return new Scaffold(
       appBar: AppBar(
-        title: Text('Login'),
+        title: Text('Buddy'),
       ),
       key: scaffoldKey,
       body: new Container(
